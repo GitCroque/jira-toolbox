@@ -1,0 +1,74 @@
+#!/bin/bash
+# Pre-commit hook pour Jira CLI
+# Vérifie qu'aucune donnée sensible n'est sur le point d'être commitée
+#
+# Installation:
+#   cp git-hooks/pre-commit .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+#
+# Pour bypasser temporairement (en cas d'urgence):
+#   git commit --no-verify
+
+echo "🔒 Pre-commit: Vérification de sécurité..."
+
+STAGED_FILES=$(git diff --cached --name-only)
+
+if [ -z "$STAGED_FILES" ]; then
+    echo "✅ Aucun fichier staged"
+    exit 0
+fi
+
+BLOCK_COMMIT=false
+
+# Vérifier les fichiers de configuration
+for file in $STAGED_FILES; do
+    # Bloquer les fichiers de config (sauf exemples)
+    if echo "$file" | grep -qE '(^|/).*config\.json$' && ! echo "$file" | grep -q "example"; then
+        echo "❌ BLOQUÉ: Fichier de configuration détecté: $file"
+        echo "   Les fichiers *config.json ne doivent pas être committés !"
+        BLOCK_COMMIT=true
+    fi
+
+    if echo "$file" | grep -q "credentials.json"; then
+        echo "❌ BLOQUÉ: Fichier credentials.json détecté: $file"
+        BLOCK_COMMIT=true
+    fi
+
+    # Vérifier le contenu des fichiers staged
+    if [ -f "$file" ]; then
+        # Chercher des tokens API
+        if grep -qE '"api_token":\s*"[A-Za-z0-9+/=]{20,}"' "$file" 2>/dev/null; then
+            echo "❌ BLOQUÉ: Token API détecté dans: $file"
+            echo "   Les tokens API ne doivent JAMAIS être committés !"
+            BLOCK_COMMIT=true
+        fi
+
+        # Chercher des patterns de credentials
+        if grep -qE '"(password|secret|token|key)":\s*"[^"]{10,}"' "$file" 2>/dev/null && \
+           ! echo "$file" | grep -qE '(example|test|mock)'; then
+            echo "⚠️  AVERTISSEMENT: Credentials possibles dans: $file"
+            echo "   Vérifiez que ce fichier ne contient pas de vraies credentials"
+        fi
+    fi
+done
+
+if [ "$BLOCK_COMMIT" = true ]; then
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "🚨 COMMIT BLOQUÉ pour des raisons de sécurité"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
+    echo "Actions à effectuer:"
+    echo "  1. git reset HEAD <fichier-sensible>"
+    echo "  2. Supprimez ou déplacez le fichier sensible"
+    echo "  3. Vérifiez .gitignore"
+    echo "  4. Recommencez le commit"
+    echo ""
+    echo "Pour bypasser ce hook (DÉCONSEILLÉ):"
+    echo "  git commit --no-verify"
+    echo ""
+    exit 1
+fi
+
+echo "✅ Vérification de sécurité passée"
+exit 0

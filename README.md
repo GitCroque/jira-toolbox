@@ -515,16 +515,99 @@ jira-toolbox/
 
 ## 🔒 Sécurité
 
+### ⚠️ IMPORTANT: Protection des Credentials
+
+**Vos tokens API Jira ne doivent JAMAIS être committés dans Git !**
+
+Consultez le **[Guide de Sécurité Complet](SECURITY.md)** pour tous les détails.
+
+### 🛡️ Mesures de Protection Automatiques
+
+#### 1. Vérification de Sécurité
+
+Avant de push, lancez:
+
+```bash
+./check_security.sh
+```
+
+Ce script vérifie:
+- ✅ Aucun fichier sensible tracké par Git
+- ✅ Aucun token API dans les fichiers staged
+- ✅ Configuration .gitignore correcte
+- ✅ Permissions des fichiers sécurisées
+
+#### 2. Hook Pre-Commit Automatique (Recommandé)
+
+Installez le hook qui vérifie **automatiquement** avant chaque commit:
+
+```bash
+./install_security_hook.sh
+```
+
+Le hook bloquera automatiquement tout commit contenant:
+- Fichiers `*config.json` (sauf `*example*.json`)
+- Tokens API
+- Credentials
+
 ### Bonnes Pratiques
 
-1. **Ne jamais commiter les tokens API** dans Git
-2. Utilisez `.gitignore` pour exclure les fichiers de configuration
-3. Limitez les permissions du fichier de config:
+1. **✅ Utilisez ~/.jira_config.json** (hors du repo)
    ```bash
+   cat > ~/.jira_config.json << 'EOF'
+   {
+     "jira_url": "https://votre-instance.atlassian.net",
+     "email": "votre.email@exemple.com",
+     "api_token": "VOTRE_TOKEN"
+   }
+   EOF
    chmod 600 ~/.jira_config.json
    ```
-4. Utilisez des tokens API avec des permissions minimales
-5. Renouvelez régulièrement vos tokens
+
+2. **✅ Ou utilisez des variables d'environnement**
+   ```bash
+   export JIRA_URL="https://votre-instance.atlassian.net"
+   export JIRA_EMAIL="votre.email@exemple.com"
+   export JIRA_API_TOKEN="votre_token"
+   ```
+
+3. **✅ Installez le hook de sécurité**
+   ```bash
+   ./install_security_hook.sh
+   ```
+
+4. **✅ Vérifiez avant de push**
+   ```bash
+   ./check_security.sh
+   git status
+   git push
+   ```
+
+5. **✅ Renouvelez vos tokens régulièrement** (tous les 3-6 mois)
+
+### ❌ À NE JAMAIS FAIRE
+
+- ❌ Créer un fichier `config.json` dans le repo
+- ❌ Committer des fichiers contenant des tokens
+- ❌ Partager votre fichier de configuration
+- ❌ Utiliser des permissions trop ouvertes (700+)
+- ❌ Bypass le hook de sécurité sans raison valable
+
+### 🚨 En Cas de Fuite
+
+Si vous avez accidentellement commité des credentials:
+
+1. **Révoquez immédiatement votre token API:**
+   - https://id.atlassian.com/manage-profile/security/api-tokens
+
+2. **Supprimez le fichier du repo:**
+   ```bash
+   git rm --cached fichier_sensible.json
+   git commit -m "Remove sensitive file"
+   git push
+   ```
+
+3. **Consultez [SECURITY.md](SECURITY.md) pour les étapes complètes**
 
 ### Permissions Requises
 

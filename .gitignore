@@ -1,6 +1,14 @@
-# Configuration avec credentials
-*.json
+# Configuration avec credentials - IMPORTANT: Ne jamais committer ces fichiers !
+# Fichiers de configuration contenant des credentials
+*config.json
+*_config.json
+.jira_config.json
+jira_config.json
+credentials.json
+
+# Exception: fichiers d'exemple (sans vraies credentials)
 !config.example.json
+!*example*.json
 
 # Python
 __pycache__/
