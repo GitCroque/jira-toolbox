@@ -1,0 +1,5 @@
+{
+  "jira_url": "https://votre-instance.atlassian.net",
+  "email": "votre.email@example.com",
+  "api_token": "votre_token_api_jira"
+}
