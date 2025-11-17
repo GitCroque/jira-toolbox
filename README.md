@@ -4,13 +4,17 @@ Une collection complète de scripts CLI Python pour administrer, auditer et cont
 
 ## 🎯 Fonctionnalités
 
-### 👥 Gestion des Utilisateurs (`user_manager.py`)
-- Lister tous les utilisateurs
+### 👥 Gestion des Utilisateurs (`user_manager.py`) ⭐ AMÉLIORÉ
+- Lister tous les utilisateurs (actifs/désactivés séparément)
 - Rechercher des utilisateurs
+- **Tri par dernière date de connexion** (optimisation licences) 🆕
 - Auditer les accès et permissions
 - Identifier les utilisateurs inactifs
-- Exporter les utilisateurs en CSV
+- **Nettoyage automatique des comptes désactivés** 🆕
+- **Suppression en masse des utilisateurs désactivés** 🆕
+- Exporter les utilisateurs en CSV avec métadonnées
 - Gérer les groupes d'utilisateurs
+- Analyse interactive pour optimisation des coûts
 
 ### 🔍 Audit et Monitoring (`audit_tool.py`)
 - Audit complet des projets
@@ -130,22 +134,60 @@ export JIRA_API_TOKEN="votre-token-api"
 
 ```bash
 # Lister tous les utilisateurs
-python3 jira_cli/scripts/user_manager.py list
+python3 jira_cli.py users list
+
+# Lister uniquement les utilisateurs actifs
+python3 jira_cli.py users list-active
+
+# Lister uniquement les utilisateurs désactivés
+python3 jira_cli.py users list-disabled
+
+# 🆕 Lister les utilisateurs par dernière connexion (optimisation licences)
+python3 jira_cli.py users list-by-login --days 90
+python3 jira_cli.py users list-by-login --days 180 --format csv --output logins.csv
 
 # Rechercher un utilisateur
-python3 jira_cli/scripts/user_manager.py search "nom.prenom"
+python3 jira_cli.py users search "nom.prenom"
 
 # Obtenir les groupes d'un utilisateur
-python3 jira_cli/scripts/user_manager.py groups <account-id>
+python3 jira_cli.py users groups <account-id>
 
 # Identifier les utilisateurs inactifs
-python3 jira_cli/scripts/user_manager.py inactive
+python3 jira_cli.py users inactive
 
 # Exporter les utilisateurs en CSV
-python3 jira_cli/scripts/user_manager.py export utilisateurs.csv
+python3 jira_cli.py users export utilisateurs.csv
 
 # Audit complet des accès
-python3 jira_cli/scripts/user_manager.py audit --output audit_users.json
+python3 jira_cli.py users audit --output audit_users.json
+
+# 🆕 Nettoyage interactif (statistiques et recommandations)
+python3 jira_cli.py users cleanup
+
+# 🆕 Supprimer les utilisateurs désactivés (simulation)
+python3 jira_cli.py users delete-disabled
+
+# 🆕 Supprimer les utilisateurs désactivés (export pour nettoyage manuel)
+python3 jira_cli.py users delete-disabled --no-dry-run
+
+# 🆕 Informations pour supprimer un utilisateur spécifique
+python3 jira_cli.py users delete-user <account-id>
+```
+
+**Scripts automatisés disponibles :**
+
+```bash
+# Audit hebdomadaire automatique
+./jira_cli/examples/user_audit_weekly.sh
+
+# Nettoyage des utilisateurs désactivés
+./jira_cli/examples/cleanup_disabled_users.sh --execute
+
+# Rapport des dernières connexions
+./jira_cli/examples/user_login_report.sh --days 90
+
+# Nettoyage complet avec recommandations
+./jira_cli/examples/user_cleanup_complete.sh
 ```
 
 ### Audit et Monitoring

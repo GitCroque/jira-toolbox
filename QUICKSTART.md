@@ -349,6 +349,46 @@ python3 jira_cli.py issues search "status = 'In Progress' AND updated < -7d"
 python3 jira_cli.py bulk transition "Blocked" --jql "status = 'In Progress' AND updated < -7d" --comment "Issue inactive depuis 7 jours"
 ```
 
+### 🆕 Optimisation des Licences et Nettoyage des Utilisateurs
+
+```bash
+# 1. Audit complet des utilisateurs
+./jira_cli/examples/user_cleanup_complete.sh
+
+# 2. Analyser les dernières connexions (90 jours)
+python3 jira_cli.py users list-by-login --days 90 --format csv --output logins_90d.csv
+
+# 3. Identifier les utilisateurs inactifs
+python3 jira_cli.py users list-disabled
+
+# 4. Nettoyage des comptes désactivés (simulation)
+python3 jira_cli.py users delete-disabled
+
+# 5. Export pour nettoyage manuel
+python3 jira_cli.py users delete-disabled --no-dry-run
+
+# 6. Statistiques et recommandations
+python3 jira_cli.py users cleanup
+```
+
+**Script automatisé hebdomadaire avec cron :**
+
+```bash
+# Éditer la crontab
+crontab -e
+
+# Ajouter l'audit hebdomadaire (chaque lundi à 8h)
+0 8 * * 1 /path/to/jira-toolbox/jira_cli/examples/user_audit_weekly.sh
+
+# Ajouter le rapport mensuel des connexions (1er de chaque mois à 9h)
+0 9 1 * * /path/to/jira-toolbox/jira_cli/examples/user_login_report.sh --days 90
+```
+
+**Économies potentielles :**
+Si vous avez 20 utilisateurs désactivés non nettoyés et que chaque licence coûte 7€/mois :
+- Économies mensuelles : 140€
+- Économies annuelles : 1 680€
+
 ## ⚡ Astuces pour Gagner du Temps
 
 ### Créer un alias
