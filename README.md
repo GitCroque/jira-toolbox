@@ -36,6 +36,52 @@ Une collection complète de scripts CLI Python pour administrer, auditer et cont
 - Export CSV des issues
 - Recherches JQL personnalisées
 
+### 🎫 Gestion des Issues (`issue_manager.py`) ⭐ NOUVEAU
+- Créer, éditer, supprimer des issues
+- Transitions de workflow (To Do → In Progress → Done)
+- Gestion complète des commentaires
+- Pièces jointes (upload, download, delete)
+- Watchers (observateurs)
+- Liens entre issues (Blocks, Relates to, etc.)
+- Clone d'issues
+- Assignation
+
+### 🏃 Gestion des Sprints (`sprint_manager.py`) ⭐ NOUVEAU
+- Créer, modifier, supprimer des sprints
+- Démarrer et terminer des sprints
+- Ajouter/retirer des issues
+- Déplacer des issues entre sprints
+- Calcul de vélocité moyenne
+- Rapports de burndown
+- Analyse de performance
+
+### 📦 Opérations en Masse (`bulk_operations.py`) ⭐ NOUVEAU
+- Création en masse d'issues
+- Mise à jour en masse
+- Suppression en masse
+- Transitions en masse
+- Assignation en masse
+- Import/Export CSV
+- Mode dry-run (simulation)
+
+### 📋 Gestion des Boards (`board_manager.py`) ⭐ NOUVEAU
+- Lister et rechercher des boards
+- Créer et configurer des boards
+- Gérer les colonnes
+- Analyse de performance
+- Export de configuration
+- Gestion du backlog
+- Epics et versions
+
+### 📊 Dashboards et Filtres (`dashboard_manager.py`) ⭐ NOUVEAU
+- Créer et gérer des dashboards
+- Copier des dashboards
+- Créer et gérer des filtres JQL
+- Partager des filtres
+- Gérer les favoris
+- Changer la propriété
+- Export des résultats
+
 ## 🚀 Installation
 
 ### Prérequis
@@ -175,6 +221,224 @@ python3 jira_cli/scripts/reporting.py export-csv PROJECT-KEY issues.csv
 
 # Recherche JQL personnalisée
 python3 jira_cli/scripts/reporting.py jql "project = PROJ AND status = Open"
+```
+
+### Gestion des Issues ⭐ NOUVEAU
+
+```bash
+# Créer une issue
+python3 jira_cli/scripts/issue_manager.py create PROJ "Ma nouvelle issue" --type Task --priority High
+
+# Voir une issue
+python3 jira_cli/scripts/issue_manager.py get PROJ-123
+
+# Mettre à jour une issue
+python3 jira_cli/scripts/issue_manager.py update PROJ-123 --summary "Nouveau titre" --priority Medium
+
+# Changer le statut (transition)
+python3 jira_cli/scripts/issue_manager.py transition PROJ-123 "In Progress" --comment "Je commence"
+
+# Voir les transitions disponibles
+python3 jira_cli/scripts/issue_manager.py transitions PROJ-123
+
+# Assigner une issue
+python3 jira_cli/scripts/issue_manager.py assign PROJ-123 --account-id 5d3e234f8b7c9a0001234567
+
+# Cloner une issue
+python3 jira_cli/scripts/issue_manager.py clone PROJ-123 --summary "Clone de l'issue"
+
+# Ajouter un commentaire
+python3 jira_cli/scripts/issue_manager.py comment-add PROJ-123 "Voici mon commentaire"
+
+# Lister les commentaires
+python3 jira_cli/scripts/issue_manager.py comment-list PROJ-123
+
+# Ajouter une pièce jointe
+python3 jira_cli/scripts/issue_manager.py attachment-add PROJ-123 /path/to/file.pdf
+
+# Lister les pièces jointes
+python3 jira_cli/scripts/issue_manager.py attachment-list PROJ-123
+
+# Ajouter un observateur
+python3 jira_cli/scripts/issue_manager.py watcher-add PROJ-123 account-id
+
+# Lier deux issues
+python3 jira_cli/scripts/issue_manager.py link PROJ-123 PROJ-456 --type Blocks
+
+# Rechercher des issues
+python3 jira_cli/scripts/issue_manager.py search "project = PROJ AND status = Open"
+
+# Supprimer une issue
+python3 jira_cli/scripts/issue_manager.py delete PROJ-123 --confirm
+```
+
+### Gestion des Sprints ⭐ NOUVEAU
+
+```bash
+# Lister les boards
+python3 jira_cli/scripts/sprint_manager.py boards --project PROJ
+
+# Créer un sprint
+python3 jira_cli/scripts/sprint_manager.py create 123 "Sprint 10" --goal "Objectif du sprint"
+
+# Démarrer un sprint
+python3 jira_cli/scripts/sprint_manager.py start 456
+
+# Lister les sprints d'un board
+python3 jira_cli/scripts/sprint_manager.py list 123
+
+# Voir les issues d'un sprint
+python3 jira_cli/scripts/sprint_manager.py issues 456
+
+# Ajouter des issues au sprint
+python3 jira_cli/scripts/sprint_manager.py add-issues 456 PROJ-123 PROJ-124 PROJ-125
+
+# Retirer des issues du sprint
+python3 jira_cli/scripts/sprint_manager.py remove-issues PROJ-123 PROJ-124
+
+# Déplacer des issues vers un autre sprint
+python3 jira_cli/scripts/sprint_manager.py move-issues 789 PROJ-123 PROJ-124
+
+# Rapport de sprint
+python3 jira_cli/scripts/sprint_manager.py report 456
+
+# Calculer la vélocité moyenne
+python3 jira_cli/scripts/sprint_manager.py velocity 123 --sprints 5
+
+# Données de burndown
+python3 jira_cli/scripts/sprint_manager.py burndown 456
+
+# Terminer un sprint
+python3 jira_cli/scripts/sprint_manager.py close 456
+
+# Exporter un résumé complet
+python3 jira_cli/scripts/sprint_manager.py export 456 sprint_summary.json
+```
+
+### Opérations en Masse ⭐ NOUVEAU
+
+```bash
+# Import CSV
+python3 jira_cli/scripts/bulk_operations.py import-csv issues.csv PROJ --type Task
+
+# Export CSV
+python3 jira_cli/scripts/bulk_operations.py export-csv "project = PROJ" export.csv
+
+# Transition en masse (avec JQL)
+python3 jira_cli/scripts/bulk_operations.py transition "In Progress" --jql "project = PROJ AND status = 'To Do'" --dry-run
+
+# Transition en masse (sans dry-run)
+python3 jira_cli/scripts/bulk_operations.py transition "In Progress" --jql "project = PROJ AND status = 'To Do'"
+
+# Assignation en masse
+python3 jira_cli/scripts/bulk_operations.py assign --keys PROJ-1 PROJ-2 PROJ-3 --account-id 5d3e234f8b7c9a
+
+# Suppression en masse (avec confirmation)
+python3 jira_cli/scripts/bulk_operations.py delete --jql "project = TEMP" --confirm
+
+# Mise à jour en masse depuis JSON
+python3 jira_cli/scripts/bulk_operations.py update updates.json
+
+# Création en masse depuis JSON
+python3 jira_cli/scripts/bulk_operations.py create issues.json --dry-run
+```
+
+### Gestion des Boards ⭐ NOUVEAU
+
+```bash
+# Lister tous les boards
+python3 jira_cli/scripts/board_manager.py list
+
+# Lister les boards d'un projet
+python3 jira_cli/scripts/board_manager.py list --project PROJ
+
+# Voir un board
+python3 jira_cli/scripts/board_manager.py get 123
+
+# Créer un board
+python3 jira_cli/scripts/board_manager.py create "Mon Board" --type scrum --project PROJ
+
+# Configuration d'un board
+python3 jira_cli/scripts/board_manager.py config 123
+
+# Voir les colonnes
+python3 jira_cli/scripts/board_manager.py columns 123
+
+# Issues d'un board
+python3 jira_cli/scripts/board_manager.py issues 123 --max 100
+
+# Backlog
+python3 jira_cli/scripts/board_manager.py backlog 123
+
+# Sprints du board
+python3 jira_cli/scripts/board_manager.py sprints 123 --state active
+
+# Epics
+python3 jira_cli/scripts/board_manager.py epics 123
+
+# Versions
+python3 jira_cli/scripts/board_manager.py versions 123 --unreleased
+
+# Résumé complet
+python3 jira_cli/scripts/board_manager.py summary 123
+
+# Analyse de performance
+python3 jira_cli/scripts/board_manager.py analyze 123
+
+# Export configuration
+python3 jira_cli/scripts/board_manager.py export 123 board_config.json
+
+# Supprimer un board
+python3 jira_cli/scripts/board_manager.py delete 123 --confirm
+```
+
+### Dashboards et Filtres ⭐ NOUVEAU
+
+```bash
+# Lister les dashboards
+python3 jira_cli/scripts/dashboard_manager.py dashboard-list
+
+# Rechercher un dashboard
+python3 jira_cli/scripts/dashboard_manager.py dashboard-search --name "Mon Dashboard"
+
+# Copier un dashboard
+python3 jira_cli/scripts/dashboard_manager.py dashboard-copy abc123 "Copie de mon dashboard"
+
+# Lister les filtres
+python3 jira_cli/scripts/dashboard_manager.py filter-list
+
+# Rechercher des filtres
+python3 jira_cli/scripts/dashboard_manager.py filter-search --name "Mes issues"
+
+# Créer un filtre
+python3 jira_cli/scripts/dashboard_manager.py filter-create "Issues ouvertes" "project = PROJ AND status != Done" --favourite
+
+# Mettre à jour un filtre
+python3 jira_cli/scripts/dashboard_manager.py filter-update 12345 --name "Nouveau nom"
+
+# Cloner un filtre
+python3 jira_cli/scripts/dashboard_manager.py filter-clone 12345 "Clone du filtre"
+
+# Lister les favoris
+python3 jira_cli/scripts/dashboard_manager.py favourite-list
+
+# Ajouter aux favoris
+python3 jira_cli/scripts/dashboard_manager.py favourite-add 12345
+
+# Changer le propriétaire
+python3 jira_cli/scripts/dashboard_manager.py filter-change-owner 12345 account-id
+
+# Permissions de partage
+python3 jira_cli/scripts/dashboard_manager.py filter-share-list 12345
+
+# Partager avec un groupe
+python3 jira_cli/scripts/dashboard_manager.py filter-share-add 12345 --type group --group developers
+
+# Exporter les résultats d'un filtre
+python3 jira_cli/scripts/dashboard_manager.py filter-export 12345 results.csv --format csv
+
+# Supprimer un filtre
+python3 jira_cli/scripts/dashboard_manager.py filter-delete 12345 --confirm
 ```
 
 ## 🛠️ Scripts Personnalisés
